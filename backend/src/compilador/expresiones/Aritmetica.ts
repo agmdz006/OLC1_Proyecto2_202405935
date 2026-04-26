@@ -8,13 +8,17 @@ export class Aritmetica extends Nodo {
     }
 
     ejecutar(entorno: Entorno): any {
-        const valIzq = this.izq.ejecutar(entorno);
-        const valDer = this.der.ejecutar(entorno);
+        let valIzq = this.izq.ejecutar(entorno);
+        let valDer = this.der.ejecutar(entorno);
+
+        // Prevención de nulls en caso de variables no inicializadas
+        if (valIzq === null || valIzq === undefined) valIzq = "";
+        if (valDer === null || valDer === undefined) valDer = "";
 
         if (this.operador === '+') {
-            // Si alguno de los dos es string, forzamos concatenación
+            // Si alguno es string, fuerza la concatenación
             if (typeof valIzq === 'string' || typeof valDer === 'string') {
-                return valIzq.toString() + valDer.toString();
+                return String(valIzq) + String(valDer);
             }
             return valIzq + valDer;
         }
@@ -22,14 +26,8 @@ export class Aritmetica extends Nodo {
         if (this.operador === '-') return valIzq - valDer;
         
         if (this.operador === '*') {
-            // Si es String * Número (Ej. "hola" * 3)
-            if (typeof valIzq === 'string' && typeof valDer === 'number') {
-                return valIzq.repeat(valDer);
-            }
-            // Si es Número * String (Ej. 5 * "#")
-            if (typeof valIzq === 'number' && typeof valDer === 'string') {
-                return valDer.repeat(valIzq);
-            }
+            if (typeof valIzq === 'string' && typeof valDer === 'number') return valIzq.repeat(valDer);
+            if (typeof valIzq === 'number' && typeof valDer === 'string') return valDer.repeat(valIzq);
             return valIzq * valDer;
         }
         
@@ -41,7 +39,6 @@ export class Aritmetica extends Nodo {
             return valIzq / valDer;
         }
 
-        // ¡AQUÍ ESTÁ EL SALVAVIDAS! El operador Módulo
         if (this.operador === '%') {
             return valIzq % valDer;
         }
@@ -49,8 +46,9 @@ export class Aritmetica extends Nodo {
 
     obtenerAST(nombrePadre: string): string {
         const id = `nodo_${Singleton.getInstancia().contadorAst++}`;
-        let dot = `${id} [label="${this.operador}"];\n${nombrePadre} -> ${id};\n`;
-        dot += this.izq.obtenerAST(id) + this.der.obtenerAST(id);
+        let dot = `${id} [label="Aritmetica\\n${this.operador}"];\n${nombrePadre} -> ${id};\n`;
+        dot += this.izq.obtenerAST(id);
+        dot += this.der.obtenerAST(id);
         return dot;
     }
 }

@@ -22,6 +22,8 @@ export class Declaracion extends Nodo {
             if (this.tipo === 'int' || this.tipo === 'float64') valorFinal = 0;
             if (this.tipo === 'string') valorFinal = "";
             if (this.tipo === 'bool') valorFinal = false;
+            // LA MAGIA PARA LOS SLICES: Inicializa como un arreglo vacío en vez de null
+            if (this.tipo && this.tipo.startsWith('[]')) valorFinal = [];
         }
 
         entorno.guardar(this.id, valorFinal, this.tipo || 'any');

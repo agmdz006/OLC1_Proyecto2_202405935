@@ -20,7 +20,9 @@ export class LlamadaFunc extends Nodo {
             if (this.id === 'append' && this.argumentos.length === 2) {
                 const arreglo = this.argumentos[0].ejecutar(entorno);
                 const valor = this.argumentos[1].ejecutar(entorno);
+                // Previene errores si el arreglo es null
                 if (Array.isArray(arreglo)) return [...arreglo, valor];
+                return [valor]; 
             }
 
             Singleton.getInstancia().addError("Semántico", `La función '${this.id}' no existe.`, this.linea, this.columna);
@@ -29,8 +31,15 @@ export class LlamadaFunc extends Nodo {
 
         const funcion = simbolo.valor as Funcion;
         
-        // Creamos un nuevo entorno para la ejecución de la función
-        const entornoLocal = new Entorno(entorno); // Idealmente debería apuntar al global directamente
+        // --- CORRECCIÓN DE LA RECURSIVIDAD ---
+        // El entorno padre de una función debe ser siempre el Global.
+        let entornoGlobal = entorno;
+        while (entornoGlobal.anterior !== null && entornoGlobal.anterior !== undefined) {
+            entornoGlobal = entornoGlobal.anterior;
+        }
+        
+        // Creamos un nuevo entorno aislado, teniendo al global como padre
+        const entornoLocal = new Entorno(entornoGlobal);
 
         // Validar cantidad de parámetros
         if (this.argumentos.length !== funcion.parametros.length) {
@@ -47,8 +56,9 @@ export class LlamadaFunc extends Nodo {
         // Ejecutar el bloque de la función
         for (const inst of funcion.bloque) {
             const resultado = inst.ejecutar(entornoLocal);
-            // Si la instrucción retornó algo (ej. un return)
-            if (resultado && typeof resultado === 'object' && resultado.tipo === 'return') {
+            
+            // Si la instrucción retornó algo (ej. un return), terminamos y devolvemos el valor
+            if (resultado !== null && resultado !== undefined && typeof resultado === 'object' && resultado.tipo === 'return') {
                 return resultado.valor;
             }
         }
@@ -57,8 +67,7 @@ export class LlamadaFunc extends Nodo {
 
     obtenerAST(nombrePadre: string): string {
         const id = `nodo_${Singleton.getInstancia().contadorAst++}`;
-        let dot = `${id} [label="Llamada\\n${this.id}()"];\n${nombrePadre} -> ${id};\n`;
-        this.argumentos.forEach(arg => { dot += arg.obtenerAST(id); });
+        let dot = `${id} [label="Llamada\\n${this.id}"];\n${nombrePadre} -> ${id};\n`;
         return dot;
     }
 }
