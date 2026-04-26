@@ -31,7 +31,6 @@ export class LlamadaFunc extends Nodo {
 
         const funcion = simbolo.valor as Funcion;
         
-        // --- CORRECCIÓN DE LA RECURSIVIDAD ---
         // El entorno padre de una función debe ser siempre el Global.
         let entornoGlobal = entorno;
         while (entornoGlobal.anterior !== null && entornoGlobal.anterior !== undefined) {

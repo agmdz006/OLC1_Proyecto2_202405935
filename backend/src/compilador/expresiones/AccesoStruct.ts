@@ -8,7 +8,7 @@ export class AccesoStruct extends Nodo {
     }
 
     ejecutar(entorno: Entorno): any {
-        // Evaluamos la parte izquierda (Ej. "vehiculo" o "vehiculo.motor")
+        // Evaluamos la parte izquierda 
         const objeto = this.expresion.ejecutar(entorno);
 
         if (objeto == null || typeof objeto !== 'object') {

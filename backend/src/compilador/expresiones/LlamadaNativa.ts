@@ -22,7 +22,7 @@ export class LlamadaNativa extends Nodo {
             return null; 
         }
 
-        // 2. Comportamiento según la función nativa llamada
+        // 2. Comportamiento según la función 
         switch (this.identificador.toLowerCase()) {
             
             case "len":
@@ -73,7 +73,7 @@ export class LlamadaNativa extends Nodo {
                 return null;
 
             case "typeof":
-                // reflect.TypeOf() te pide el tipo como string
+                // reflect.TypeOf() pide el tipo como string
                 const valor = valoresArgs[0];
                 if (typeof valor === 'number') {
                     // Si no tiene decimales, asumimos int, de lo contrario float64
@@ -90,7 +90,7 @@ export class LlamadaNativa extends Nodo {
                 const arregloIndex = this.argumentos[0].ejecutar(entorno);
                 const valorBuscado = this.argumentos[1].ejecutar(entorno);
                 if (Array.isArray(arregloIndex)) {
-                    // indexOf busca el elemento y devuelve su posición (o -1 si no existe)
+                    // indexOf busca el elemento y devuelve su posición 
                     return arregloIndex.indexOf(valorBuscado);
                 }
                 return -1;
